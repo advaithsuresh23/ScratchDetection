@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>YOLOv8 Scratch Detection</title>
+    <style>
+        canvas {
+            display:block;
+            margin-top:20px;
+        }
+    </style>
+</head>
+<body>
+    <input id="uploadInput" type="file"/>
+    <canvas></canvas>
+    <script>
+       /**
+       * Upload button to select test image in test_images directory
+       * and upload image for scratch detection and measurement
+       */
+       const input = document.getElementById("uploadInput");
+       input.addEventListener("change",async(event) => {
+           const file = event.target.files[0]
+           const data = new FormData();
+           data.append("image_file",file,"image_file");
+           const response = await fetch("/detect",{
+               method:"post",
+               body:data
+           });
+           const boxes = await response.json();
+           const img = new Image();
+           img.src = URL.createObjectURL(file);
+           display_detection_results(img,boxes);
+       })
+
+       /**
+       * Displays test image with each detected scratch
+       * identified with a bounding box and the associated measurement
+       * displayed adjacent to the box
+       */
+       function display_detection_results(img,boxes) {
+          img.onload = () => {
+              const canvas = document.querySelector("canvas");
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img,0,0);
+              ctx.strokeStyle = "#FF0000";
+              ctx.lineWidth = 3;
+              ctx.font = "18px arial";
+              boxes.forEach(([x1,y1,x2,y2,label,prob,length]) => {
+                  ctx.strokeRect(x1,y1,x2-x1,y2-y1);
+                  ctx.fillStyle = "#FF0000";
+                  const width = ctx.measureText(label).width;
+                  ctx.fillRect(x1,y1-25,width+5,25);
+                  ctx.fillStyle = "#000000";
+                  ctx.fillText(label,x1,y1-7);
+                  ctx.fillText(length,x2,y2);
+              });
+          }
+       }
+  </script>
+</body>
+</html>
