@@ -19,6 +19,6 @@ Using YOLOv8 object detection, this webapp uses a trained object detection model
 ## Testing
 * Ensure best.pt is in the same directory as scratch_detector.py
 * Run scratch_detector.py and access webpage via http://localhost:8080/
-* Choose file from 'Demo Test Images' folder to run object detection on test image
+* Choose a YOLO test image to run object detection on image
 
 
